@@ -47,7 +47,7 @@ Modified by: George Rudolph
 
 def question2() -> tuple[float, float]:
     answerDiscount = 0.9
-    answerNoise = 0.2
+    answerNoise = 0.0
     return answerDiscount, answerNoise
 
 def question3a():
