@@ -226,4 +226,49 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
         of states to update.
         """
         "*** YOUR CODE HERE ***"
-        
+        states = self.mdp.getStates()
+
+        predecessors = {}
+
+        for state in states:
+            if self.mdp.isTerminal(state):
+                predecessors[state] = set()
+            else:
+                predecessors[state] = set()
+
+        queue = util.PriorityQueue()
+
+        for state in states:
+            if self.mdp.isTerminal(state):
+                continue
+
+            actions = self.mdp.getPossibleActions(state)
+            for action in actions:
+                transitions = self.mdp.getTransitionStatesAndProbs(state,action)
+
+                for next_state, prob in transitions:
+                    if prob >0 and not self.mdp.isTerminal(next_state):
+                        predecessors[next_state].add(state)
+
+            v = self.values[state]
+            best_action = self.getAction(state)
+            q_v = self.computeQValueFromValues(state,best_action)
+            diff = abs(v-q_v)
+            queue.push(state, -diff)
+
+        for k in range(0,self.iterations):
+            if queue.isEmpty():
+                return
+            state = queue.pop()
+
+            best_action = self.getAction(state)
+            self.values[state] = self.computeQValueFromValues(state, best_action)
+
+            for predecessor in predecessors[state]:
+                v= self.values[predecessor]
+                best_action = self.getAction(predecessor)
+                q_v = self.computeQValueFromValues(predecessor, best_action)
+                diff = abs(v-q_v)
+
+                if diff > self.theta:
+                    queue.update(predecessor, -diff)
