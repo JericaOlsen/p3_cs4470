@@ -178,6 +178,20 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
         updating one state value at a time.
         """
         "*** YOUR CODE HERE ***"
+        states  = self.mdp.getStates()
+        for i in range(self.iterations):
+            v_k = util.Counter()
+            state = states[i % len(states)]
+            actions = self.mdp.getPossibleActions(state)
+            if not actions:
+                continue
+            else:
+                v_k[state] = max(self.computeQValueFromValues(state,action) for action in actions)
+
+            self.values[state] = v_k[state]
+
+
+
 
 
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
