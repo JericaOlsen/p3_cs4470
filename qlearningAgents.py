@@ -112,7 +112,7 @@ class QLearningAgent(ReinforcementAgent):
             return 0.0
         
         best_action = self.computeActionFromQValues(state)
-        return self.qvalues[(state,best_action)]
+        return self.getQValue(state,best_action)
 
     def computeActionFromQValues(self, state: Any) -> Any:
         """
@@ -270,8 +270,12 @@ class ApproximateQAgent(PacmanQAgent):
             float: Approximated Q-value
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        q_val = 0.0
+        features = self.featExtractor.getFeatures(state,action)
+        for feature in features:
+            q_val += self.weights[feature] * features[feature]
+        return q_val
+    
     def update(self, state: Any, action: Any, nextState: Any, reward: float) -> None:
         """
         Update feature weights based on transition.
@@ -284,7 +288,14 @@ class ApproximateQAgent(PacmanQAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        util.raiseNotDefined()
+        feature_vector = self.featExtractor.getFeatures(state,action)
+        curr_q_value = self.getQValue(state,action)
+        next_q_value = self.getValue(nextState)
+
+        diff = reward + (self.discount * next_q_value) - curr_q_value
+
+        for feature in feature_vector:
+            self.weights[feature] = self.weights[feature] + (self.alpha * diff * feature_vector[feature])
 
     def final(self, state: Any) -> None:
         """
